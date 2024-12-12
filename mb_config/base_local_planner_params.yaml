@@ -1,0 +1,52 @@
+#For full documentation of the parameters in this file, and a list of all the
+#parameters available for TrajectoryPlannerROS, please see
+#http://www.ros.org/wiki/base_local_planner
+TrajectoryPlannerROS:
+  # Set the acceleration limits of the robot
+  acc_lim_th: 3.2 
+  acc_lim_x: 2.5
+  acc_lim_y: 2.5
+
+  # Set the velocity limits of the robot
+  max_vel_x: 0.55         # Incrementa la velocidad máxima en el eje X
+  min_vel_x: 0.4         # Asegúrate de que la velocidad mínima no sea demasiado baja
+  max_rotational_vel: 2.0 # Incrementa la velocidad rotacional máxima
+  min_in_place_rotational_vel: 0.5 # Aumenta la velocidad mínima en el lugar
+
+  # The velocity the robot will command when trying to escape from a stuck situation
+  escape_vel: -0.1
+
+  # For this example, we'll use a holonomic robot
+  holonomic_robot: false
+
+  # Since we're using a holonomic robot, we'll set the set of y velocities it will sample
+  y_vels: [-0.3, -0.1, 0.1, 0.3]
+
+  # Set the tolerance on achieving a goal
+  xy_goal_tolerance: 0.1 
+  yaw_goal_tolerance: 0.03 
+
+  # We'll configure how long and with what granularity we'll forward simulate trajectories
+  sim_time: 3.0             # Aumenta el tiempo de simulación
+  sim_granularity: 0.025    # Mantén la granularidad de simulación
+  vx_samples: 20            # Aumenta el número de muestras en el eje X
+  vtheta_samples: 40        # Mantén o ajusta el número de muestras en el eje Theta
+
+  # Parameters for scoring trajectories
+  goal_distance_bias: 1.5   # Ajusta el sesgo de distancia a la meta
+  path_distance_bias: 1.0   # Ajusta el sesgo de distancia al camino
+  occdist_scale: 0.01
+  heading_lookahead: 0.325
+
+  # Use the Dynamic Window Approach to control instead of Trajectory Rollout for this example
+  dwa: true
+
+  # How far the robot must travel before oscillation flags are reset
+  oscillation_reset_dist: 0.05
+
+  # Eat up the plan as the robot moves along it
+  prune_plan: true
+
+  #cmd_vel_topic: $(arg robot_prefix)cmd_vel
+
+

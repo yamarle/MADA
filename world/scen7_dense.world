@@ -1,0 +1,173 @@
+define block model
+(
+  size [0.5 0.5 0.5]
+  gui_nose 0
+)
+
+define topurg ranger
+(
+  sensor( 			
+    range [ 0.0  10.0 ]
+    #fov 270.25
+    fov 360
+    samples 1081
+  )
+
+  # generic model properties
+  color "black"
+  size [ 0.05 0.05 0.1 ] 
+)
+
+# LOS OBJETOS QUE METO YO
+
+# Explorador
+define explorer position
+(
+  #size [0.415 0.392 0.25]
+  size [0.35 0.35 0.25]
+  #origin [-0.05 0 0 0]
+  origin [0 0 0 0]
+  gui_nose 1
+  drive "diff"
+  topurg(pose [ 0.050 0.000 -0.1 0.000 ])
+  color "blue"
+)
+
+# Relays
+define relay position
+(
+  #size [0.415 0.392 0.25]
+  size [0.35 0.35 0.25]
+  origin [-0.05 0 0 0]
+  gui_nose 1
+  drive "diff"
+  topurg(pose [ 0.050 0.000 -0.1 0.000 ])
+  color "blue"
+)
+
+# Obstáculos dinámicos
+define obstacle position
+(
+  #size [0.35 0.35 0.25]
+  size [0.25 0.45 1]
+  origin [-0.05 0 0 0]
+  gui_nose 1
+  drive "diff"
+  #topurg(pose [ 0.050 0.000 -0.1 0.000 ])
+  color "red"
+)
+
+define floorplan model
+(
+  # sombre, sensible, artistic
+  color "gray30"
+
+  # most maps will need a bounding box
+  boundary 1
+
+  gui_nose 0
+  gui_grid 0
+
+  gui_outline 0
+  gripper_return 0
+  fiducial_return 0
+  laser_return 1
+)
+
+# set the resolution of the underlying raytrace model in meters
+resolution 0.02
+
+interval_sim 100  # simulation timestep in milliseconds
+
+
+window
+( 
+  #size [ 1045.000 900.000 ] 
+  size [ 2045.000 1800.000 ] 
+  center [26 20]
+  rotate [ 0.000 0.0000 ]
+  #scale 28.806 
+  scale 39.0
+  show_data 1 # mostrar laser
+)
+
+floorplan (
+  size [51.6 37.425  1] #metros (a imagem tem 688x499pixeis => 0.075 resolução no .yaml)
+  pose [25.8 18.7125 0 0]
+  #pose [0 0 0 0]
+  bitmap "scen7.pgm"
+)
+
+# robots
+explorer( pose [ 2.5 21.0 0 10 ] name "explorer")
+
+# obstáculos
+
+# habitación 1
+obstacle( pose [  5.0 14.7 0   0 ] name "obst0")
+obstacle( pose [  6.0 17.7 0  37 ] name "obst1")
+
+# habitación 2
+obstacle( pose [ 11.5 16.3 0 320 ] name "obst2")
+
+# habitación grande pasillo
+obstacle( pose [ 16.0 15.5 0 180 ] name "obst3")
+obstacle( pose [ 16.0 20.5 0  80 ] name "obst4")
+obstacle( pose [ 18.0 26.5 0 180 ] name "obst5")
+obstacle( pose [ 16.3 19.5 0  10 ] name "obst6")
+obstacle( pose [ 17.4 16.5 0 230 ] name "obst7")
+
+# habitaciones final
+obstacle( pose [ 28.5 26.5 0  10 ] name "obst8")
+obstacle( pose [ 24.0 21.5 0 310 ] name "obst9")
+obstacle( pose [ 31.0 26.4 0   0 ] name "obst10")
+obstacle( pose [ 32.0 25.0 0 190 ] name "obst11")
+obstacle( pose [ 29.0 24.1 0  10 ] name "obst12")
+
+# "conector" medio
+obstacle( pose [ 33.4 21.5 0 220 ] name "obst13")
+obstacle( pose [ 34.0 22.4 0 180 ] name "obst14")
+obstacle( pose [ 35.0 20.4 0  10 ] name "obst15")
+
+# medio (final del pasillo)
+obstacle( pose [ 34.0 16.4 0   0 ] name "obst16")
+obstacle( pose [ 33.7 14.0 0 290 ] name "obst17")
+obstacle( pose [ 35.0 13.1 0  10 ] name "obst18")
+obstacle( pose [ 36.4 15.5 0 310 ] name "obst19")
+obstacle( pose [ 39.0 15.1 0 210 ] name "obst20")
+
+# habitación arriba
+obstacle( pose [ 40.0 26.7 0   0 ] name "obst21")
+obstacle( pose [ 41.5 26.3 0  30 ] name "obst22")
+obstacle( pose [ 42.0 29.7 0   0 ] name "obst23")
+obstacle( pose [ 40.5 26.3 0  30 ] name "obst24")
+
+# pasillo abajo
+obstacle( pose [ 37.0  3.1 0  10 ] name "obst25")
+obstacle( pose [ 36.4  2.5 0 310 ] name "obst26")
+obstacle( pose [ 36.0  1.1 0 210 ] name "obst27")
+obstacle( pose [ 34.0  3.4 0  30 ] name "obst28")
+
+# derecha abajo
+obstacle( pose [ 47.0  8.4 0 190 ] name "obst29")
+obstacle( pose [ 40.0  3.4 0  20 ] name "obst30")
+obstacle( pose [ 43.0  4.5 0  10 ] name "obst31")
+obstacle( pose [ 44.0 12.0 0 230 ] name "obst32")
+obstacle( pose [ 41.0  7.0 0 130 ] name "obst33")
+obstacle( pose [ 43.0  9.0 0  10 ] name "obst34")
+obstacle( pose [ 45.0  4.7 0  30 ] name "obst35")
+obstacle( pose [ 42.0 11.7 0 330 ] name "obst36")
+obstacle( pose [ 42.1 10.3 0 130 ] name "obst37")
+
+# derecha medio
+obstacle( pose [ 48.4 17.5 0  20 ] name "obst38")
+obstacle( pose [ 45.0 17.0 0 130 ] name "obst39")
+
+
+
+
+
+
+
+
+
