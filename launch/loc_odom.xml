@@ -1,0 +1,9 @@
+<launch>
+
+	<arg name="map_topic"   default="map"/>
+	<arg name="odom_frame_id"   default="odom"/>
+
+	<!-- Es necesaria esta transformada -->
+	<node pkg="tf" type="static_transform_publisher" name="map_to_base_laser_tf" args="0.0 0.0 0.0 0.0 0.0 0.0 $(arg map_topic) $(arg odom_frame_id) 10.0" />
+
+</launch>

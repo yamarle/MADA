@@ -1,0 +1,152 @@
+<launch>
+    <master auto="start"/>
+    <param name="/use_sim_time" value="true"/>
+
+    <arg name="scenario_name" value="scen10"/>
+    <arg name="scenario_type" value="nondense"/>
+    <arg name="Nobst" value="10"/>
+    
+    <arg name="scenario_time" value="600"/>
+
+    <arg name="seed" value="1"/>
+
+    <!-- MAP -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find mada)/world/$(arg scenario_name).yaml" respawn="false" />
+    
+    <!-- WORLD -->
+    <node pkg="stage_ros" type="stageros" name="stageros" args="$(find mada)/world/$(arg scenario_name)_$(arg scenario_type).world" respawn="false">
+        <param name="base_watchdog_timeout" value="0.2"/>
+    </node>
+
+    <!-- =================================================================================================================== -->
+    <!--                                                    ROBOT                                                            -->
+    <!-- =================================================================================================================== -->
+
+    <!-- ********************************************************** -->
+    <!-- ROBOT PARAMETERS -->
+    <arg name="sX" value="0.3"/>
+    <arg name="sY" value="0.3"/>
+    <arg name="laser_range" value="10"/>
+    <arg name="linearVel" value="0.55"/>
+    <arg name="angularVel" value="1.0"/>
+    <arg name="inflFact" value="1.0"/>
+
+    <arg name="map_topic" value="map"/>
+
+    <!-- 
+    <arg name="robot_base_name" value=""/>
+    <arg name="robot_prefix" value=""/>
+    -->
+
+    <arg name="robot_base_name" value="robot_"/>
+    <arg name="robot_prefix" value="$(arg robot_base_name)0/"/>
+
+    <!-- <arg name="localization_topic" value="$(arg robot_prefix)base_pose_ground_truth"/> -->
+    <arg name="laser_topic" value="$(arg robot_prefix)base_scan"/>
+    <arg name="robot_frame" value="$(arg robot_prefix)base_link"/>
+    <arg name="path_topic" value="$(arg robot_prefix)pathToFollow"/>
+    <arg name="vel_topic" value="$(arg robot_prefix)cmd_vel"/>
+
+    <arg name="occup_threshold" value="1.0"/>
+    <arg name="forget_obstacles" value="2"/>
+    <arg name="max_mission_time" value="$(arg scenario_time)"/>
+
+    <arg name="monitoring_type" value="mada"/>
+    <arg name="navigation_type" value="pf"/>
+
+    <!-- ********************************************************** -->
+
+    <!-- Localization -->
+    <arg name="localization_topic" value="$(arg robot_prefix)amcl_pose"/>
+    <node name="fake_localization" pkg="fake_localization" type="fake_localization" respawn="false">
+        <remap from="amcl_pose" to="$(arg localization_topic)" />
+        <remap from="scan_topic" to="$(arg laser_topic)" />
+        <remap from="base_pose_ground_truth" to="$(arg robot_prefix)base_pose_ground_truth" />
+        <param name="odom_frame_id"   value="$(arg robot_prefix)odom"/>
+        <param name="base_frame_id"   value="$(arg robot_prefix)base_link"/>
+        <param name="global_frame_id"   value="$(arg map_topic)"/>
+    </node>
+
+    <!-- PLANNER NODE-->
+    <node pkg="mada" type="$(arg monitoring_type)_$(arg navigation_type)" name="$(arg monitoring_type)_$(arg navigation_type)" output="screen">
+        <param name="robot_name" value="$(arg robot_prefix)"/>
+        <param name="map_topic" value="$(arg map_topic)"/>
+        <param name="pose_topic" value="$(arg localization_topic)"/>
+        <param name="robot_frame" value="$(arg robot_frame)"/>
+        <param name="laser_topic" value="$(arg laser_topic)"/>
+        <param name="pathToFollow_topic" value="$(arg vel_topic)"/>
+        <param name="sX" value="$(arg sX)"/>
+        <param name="sY" value="$(arg sY)"/>
+        <param name="laser_range" value="$(arg laser_range)"/>
+        <param name="maxLinearVel" value="$(arg linearVel)"/>
+        <param name="maxAngularVel" value="$(arg angularVel)"/>
+        <param name="occup_thres" value="$(arg occup_threshold)"/>
+        <param name="forget_dynamic_areas" value="$(arg forget_obstacles)"/>
+        <param name="max_mission_time" value="$(arg max_mission_time)"/>
+        <param name="inflFact" value="$(arg inflFact)"/>
+        <param name="monitoring_type" value="$(arg Nobst)"/>
+    </node>
+
+    <!-- =================================================================================================================== -->
+    <!--                                                    OBSTACLES                                                        -->
+    <!-- =================================================================================================================== -->
+    <!-- ********************************************************** -->
+    <arg name="obstFootprint_topic" value="obstacle"/>
+    <arg name="osX" value="0.25"/>
+    <arg name="osY" value="0.45"/>
+    <arg name="obstLinearVel" value="0.2"/>
+    <arg name="obstAngularVel" value="0.5"/>
+    <arg name="obstLinearAcc" value="0.05"/>
+    <arg name="obstAngularAcc" value="0.01"/>
+    <arg name="navAreaType" value="0"/> <!-- 0: free movement, 1: navigation within partitions, 2: within circular areas -->
+    <!-- ********************************************************** -->
+
+    <node pkg="mada" type="mada_obstacles" name="mada_obstacles" output="screen">
+        <param name="map_topic" value="map"/>
+        <param name="Nobst" value="$(arg Nobst)"/>
+        <param name="footprint_topic" value="obstacle"/>
+        <param name="sX" value="$(arg osX)"/>
+        <param name="sY" value="$(arg osY)"/>
+        <param name="maxLinearVel" value="$(arg obstLinearVel)"/>
+        <param name="maxAngularVel" value="$(arg obstLinearVel)"/>
+        <param name="linearAcc" value="$(arg obstLinearAcc)"/>
+        <param name="angularAcc" value="obstAngularAcc"/>
+        <param name="seed" value="$(arg seed)"/>
+        <param name="navAreaType" value="0"/>
+    </node>
+
+    <!-- =================================================================================================================== -->
+
+    <!-- MADA MASTER -->
+    <arg name="collision_distance" value="0.12"/> <!-- Es un valor con el que se detecta una colisión en Stage -->
+
+    <node pkg="mada" type="mada_master_node" name="mada_master_node" output="screen">
+        <param name="map_topic" value="$(arg map_topic)"/>
+
+        <param name="Nr" value="1"/>
+        <param name="robots_base_name" value="$(arg robot_base_name)"/>
+        <param name="robot_pose_name" value="amcl_pose"/>
+        <param name="rx" value="$(arg sX)"/>
+        <param name="ry" value="$(arg sY)"/>
+
+        <param name="No" value="$(arg Nobst)"/>
+        <param name="obstacles_base_name" value="$(arg robot_base_name)"/>
+        <param name="obstacle_pose_name" value="base_pose_ground_truth"/>
+        <param name="ox" value="$(arg osX)"/>
+        <param name="oy" value="$(arg osY)"/>
+
+        <param name="collision_distance" value="$(arg collision_distance)"/>
+        <param name="inflFact" value="$(arg inflFact)"/>
+
+    </node>
+
+    <!-- RViZ -->
+
+    <node name="rviz1" pkg="rviz" type="rviz" args="-d $(find mada)/rviz/$(arg scenario_name)/$(arg monitoring_type)/$(arg navigation_type)/low_level_planning.rviz" />
+    <node name="rviz2" pkg="rviz" type="rviz" args="-d $(find mada)/rviz/$(arg scenario_name)/$(arg monitoring_type)/$(arg navigation_type)/high_level_planning.rviz" />
+
+</launch>
+
+
+
+ 
