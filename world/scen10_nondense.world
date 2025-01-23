@@ -1,0 +1,120 @@
+define block model
+(
+  size [0.5 0.5 0.5]
+  gui_nose 0
+)
+
+define topurg ranger
+(
+  sensor( 			
+    range [ 0.0  30.0 ]
+    #fov 270.25
+    fov 360
+    samples 540
+  )
+
+  # generic model properties
+  color "black"
+  size [ 0.05 0.05 0.1 ] 
+)
+
+# LOS OBJETOS QUE METO YO
+
+# Explorador
+define explorer position
+(
+  #size [0.415 0.392 0.25]
+  size [0.35 0.35 0.25]
+  #origin [-0.05 0 0 0]
+  origin [0 0 0 0]
+  gui_nose 1
+  drive "diff"
+  topurg(pose [ 0.050 0.000 -0.1 0.000 ])
+  color "blue"
+)
+
+# Relays
+define relay position
+(
+  #size [0.415 0.392 0.25]
+  size [0.35 0.35 0.25]
+  origin [-0.05 0 0 0]
+  gui_nose 1
+  drive "diff"
+  topurg(pose [ 0.050 0.000 -0.1 0.000 ])
+  color "blue"
+)
+
+# Obstáculos dinámicos
+define obstacle position
+(
+  #size [0.35 0.35 0.25]
+  size [0.25 0.45 1]
+  origin [-0.05 0 0 0]
+  gui_nose 1
+  drive "diff"
+  #topurg(pose [ 0.050 0.000 -0.1 0.000 ])
+  color "red"
+)
+
+define floorplan model
+(
+  # sombre, sensible, artistic
+  color "gray30"
+
+  # most maps will need a bounding box
+  boundary 1
+
+  gui_nose 0
+  gui_grid 0
+
+  gui_outline 0
+  gripper_return 0
+  fiducial_return 0
+  laser_return 1
+)
+
+# set the resolution of the underlying raytrace model in meters
+resolution 0.02
+
+interval_sim 100  # simulation timestep in milliseconds
+
+
+window
+( 
+  size [ 1045.000 900.000 ] 
+  #size [ 2045.000 1800.000 ] 
+  center [15 10]
+  rotate [ 0.000 0.0000 ]
+  scale 28.806 
+  #scale 60.0
+  show_data 1 # mostrar laser
+)
+
+# load an environment bitmap
+floorplan
+( 
+  name "scen10"
+  bitmap "scen10.pgm"
+  size [31.3 21.9 2]
+  #pose [ -29.350 27.000 0 90.000 ]
+  pose [ 15.65 10.95 0 0 ]
+  #pose [ 27 29.35 0 0 ]
+)
+
+# robots
+explorer( pose [ 4.5 2.5 0 0 ] name "explorer")
+
+obstacle( pose [ 14 6.5 0 180 ] name "obst0")
+obstacle( pose [ 15 6.5 0 90 ] name "obst1")
+obstacle( pose [ 16 7.5 0 -90 ] name "obst2")
+
+obstacle( pose [ 15.5 16.5 0 90 ] name "obst3")
+obstacle( pose [ 13 13.5 0 0 ] name "obst4")
+obstacle( pose [ 9.5 4.5 0 180 ] name "obst5")
+obstacle( pose [ 9.5 8.5 0 180 ] name "obst6")
+obstacle( pose [ 11.5 7.5 0 -90 ] name "obst7")
+
+obstacle( pose [ 26 14.5 0 85 ] name "obst8")
+obstacle( pose [ 24.5 13.5 0 -90 ] name "obst9")
+
